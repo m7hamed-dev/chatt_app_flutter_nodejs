@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,17 +49,75 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Socket socket = io("http://127.0.0.1:3000/", <String, dynamic>{
+    "transports": ["websocket"],
+    "autoConnect": false,
+  }); //initalize the Socket.IO Client Object
+
+  @override
+  void initState() {
+    super.initState();
+    initializeSocket(); //--> call the initializeSocket method in the initState of our app.
+  }
+
+  @override
+  void dispose() {
+    socket
+        .disconnect(); // --> disconnects the Socket.IO client once the screen is disposed
+    super.dispose();
+  }
+
+  void initializeSocket() {
+    print('initializeSocket');
+    try {
+      socket = io("http://127.0.0.1:3000/", <String, dynamic>{
+        "transports": ["websocket"],
+        "autoConnect": false,
+      });
+      socket.connect(); //connect the Socket.IO Client to the Server
+
+      //SOCKET EVENTS
+      // --> listening for connection
+      socket.on('connect', (data) {
+        print(socket.connected);
+      });
+
+      //listen for incoming messages from the Server.
+      socket.on('message', (data) {
+        print(data); //
+      });
+
+      //listens when the client is disconnected from the Server
+      socket.on('disconnect', (data) {
+        print('disconnect');
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   int _counter = 0;
 
   void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+    // setState(() {
+    //   // This call to setState tells the Flutter framework that something has
+    //   // changed in this State, which causes it to rerun the build method below
+    //   // so that the display can reflect the updated values. If we changed
+    //   // _counter without calling setState(), then the build method would not be
+    //   // called again, and so nothing would appear to happen.
+    //   _counter++;
+    // });
+    sendMessage(String message) {
+      socket.emit(
+        "message",
+        {
+          "id": socket.id,
+          "message": message, //--> message to be sent
+          "username": 'username',
+          "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
+        },
+      );
+    }
   }
 
   @override
