@@ -17,7 +17,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    ChatAPIs.initializeSocket();
+    ChatAPIs.initializeSocket(context);
   }
 
   // final String targetID;
@@ -41,11 +41,10 @@ class _LoginViewState extends State<LoginView> {
                   (index) {
                     return InkWell(
                       onTap: () {
-                        _usersProvier.setLoginUser(_usersProvier.users[index]);
-                        //
                         ChatAPIs.signInUserInSocket(
                             _usersProvier.users[index].id);
                         //
+                        _usersProvier.setLoginUser(_usersProvier.users[index]);
                         Push.to(context, const UserContactsView());
                       },
                       child: Container(

@@ -11,11 +11,10 @@ var clients = {};
 
 io.on("connection", (socket) => {
     console.log("connetetd success !!");
-    // console.log('socket connected with id = ', socket.id, );
     /// signIn user
-    socket.on("/signIn", (id) => {
+    socket.on("signIn", (id) => {
         console.log('signin user by id ', id);
-        // clients[id] = socket;
+        clients[id] = socket;
         // console.log(clients);
     });
     /// on msg
@@ -23,6 +22,7 @@ io.on("connection", (socket) => {
         console.log(msg);
         let targetId = msg.targetId;
         if (clients[targetId]) clients[targetId].emit("message", msg);
+        console.log('targetId', targetId);
     });
 });
 

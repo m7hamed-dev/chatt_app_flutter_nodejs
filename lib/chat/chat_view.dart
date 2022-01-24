@@ -1,8 +1,11 @@
-import 'package:chat_app_nodejs/chat/chat_bubble.dart';
+import 'package:chat_app_nodejs/chat/own_msg_cart.dart';
 import 'package:chat_app_nodejs/chat_api/chat_api.dart';
+import 'package:chat_app_nodejs/models/msg_model.dart';
 import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
+
+import 'reply_msg_card.dart';
 
 class CahtView extends StatefulWidget {
   const CahtView({Key? key, required this.userID}) : super(key: key);
@@ -15,19 +18,16 @@ class _CahtViewState extends State<CahtView> {
   @override
   void initState() {
     super.initState();
-    ChatAPIs.initializeSocket();
+    ChatAPIs.initializeSocket(context);
   }
 
-  // void sendMessage(String message, String targetID) {
-  //   // second send msg
-  //   socket.emit("message", {
-  //     "id": widget.userID,
-  //     "message": message,
-  //     "username": targetID,
-  //     "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
-  //   });
-  // }
+  //
+  void setMessage(String msg, String type) {
+    ChatAPIs.messages.add(MsgModel(msg: msg, type: type));
+    setState(() {});
+  }
 
+  ///
   @override
   Widget build(BuildContext context) {
     final _usersProvier = context.watch<UserProvider>();
@@ -42,29 +42,29 @@ class _CahtViewState extends State<CahtView> {
           icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
-      body: ListView(
-        children: [
-          ..._allMsgs(),
-        ],
+      body: ListView.builder(
+        itemCount: ChatAPIs.messages.length,
+        itemBuilder: (context, index) {
+          //
+          if (ChatAPIs.messages[index].type == 'source') {
+            return OwnMsgCard(msg: ChatAPIs.messages[index].msg);
+          }
+          return ReplyMsgCard(msg: ChatAPIs.messages[index].msg);
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // sendMessage('hi mohamed', _usersProvier.currentUser.id);
+          setMessage('msg', 'source');
+          //
+          ChatAPIs.sendMessage(
+            _usersProvier.loginUser.id,
+            'hi , msg',
+            widget.userID,
+          );
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
-  }
-
-  List<ChatBubble> _allMsgs() {
-    return List.generate(
-        90, (index) => ChatBubble(isSender: true, msg: 'msg $index')).toList();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    // socket.disconnect();
   }
 }
