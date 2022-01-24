@@ -1,126 +1,53 @@
+import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
-import 'package:socket_io_client/socket_io_client.dart';
-
-class UserView extends StatelessWidget {
-  const UserView({Key? key}) : super(key: key);
-  // final String targetID;
-
-  @override
-  Widget build(BuildContext context) {
-    final _usersProvier = context.watch<UserProvider>();
-    return Scaffold(
-      body: ListView(
-        children: List.generate(
-          _usersProvier.users.length,
-          (index) {
-            return InkWell(
-              onTap: () {
-                debugPrint('statement');
-                _usersProvier.setUser(_usersProvier.users[index]);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CahtView(),
-                  ),
-                );
-              },
-              child: Container(
-                color: Colors.grey.shade200,
-                margin: const EdgeInsets.all(10.0),
-                padding: const EdgeInsets.all(30.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(_usersProvier.users[index].id),
-                    Text(_usersProvier.users[index].name),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class UserModel {
-  final String id;
-  final String name;
-
-  UserModel({required this.id, required this.name});
-}
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class CahtView extends StatefulWidget {
-  const CahtView({Key? key}) : super(key: key);
-
+  const CahtView({Key? key, required this.userID}) : super(key: key);
+  final String userID;
   @override
   State<CahtView> createState() => _CahtViewState();
 }
 
 class _CahtViewState extends State<CahtView> {
-  Socket socket = io("http://127.0.0.1:3000/", <String, dynamic>{
-    "transports": ["websocket"],
-    "autoConnect": false,
-  }); //initalize the Socket.IO Client Object
-
   @override
   void initState() {
     super.initState();
-    //--> call the initializeSocket method in the initState of our app.
     initializeSocket();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    // --> disconnects the Socket.IO client once the screen is disposed
-    socket.disconnect();
-  }
-
-  final String ipAddress = '192.168.2.225';
+  io.Socket socket = io.io("http://192.168.127.225:5000", <String, dynamic>{
+    "transports": ["websocket"],
+    "autoConnect": false,
+  });
+  // final String ipAddress = '192.168.133.225';
   void initializeSocket() {
-    print('initializeSocket');
+    // debugPrint('initializeSocket .........');
     try {
-      socket = io("http://$ipAddress:5000/", <String, dynamic>{
-        "transports": ["websocket"],
-        "autoConnect": false,
-      });
-      //connect the Socket.IO Client to the Server
       socket.connect();
-      //SOCKET EVENTS
-      // --> listening for connection
-      socket.on('connect', (data) {
-        print('socket.connected = ${socket.connected}');
+      // event on connect success
+      socket.onConnect((_) {
+        debugPrint('onConnect');
       });
-
-      //listen for incoming messages from the Server.
-      socket.on('message', (data) {
-        print(data); //
-      });
-
-      //listens when the client is disconnected from the Server
-      socket.on('disconnect', (data) {
-        print('socket = ${socket.connected}');
+      // first login user by id
+      socket.emit("signIn", widget.userID);
+      socket.onError((error) {
+        debugPrint('error = $error');
       });
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
   void sendMessage(String message, String targetID) {
-    debugPrint('sendMessage');
-    socket.emit(
-      "message",
-      {
-        "id": socket.id,
-        "message": message, //--> message to be sent
-        "username": targetID,
-        "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
-      },
-    );
+    // second send msg
+    socket.emit("message", {
+      "id": widget.userID,
+      "message": message,
+      "username": targetID,
+      "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
+    });
   }
 
   @override
@@ -135,46 +62,17 @@ class _CahtViewState extends State<CahtView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          sendMessage('hi mohamed', _usersProvier.currentUser.name);
+          sendMessage('hi mohamed', _usersProvier.currentUser.id);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
   }
-}
 
-class UserProvider extends ChangeNotifier {
-  var users = <UserModel>[
-    UserModel(id: '1', name: 'mohamed'),
-    UserModel(id: '2', name: 'syed'),
-    UserModel(id: '3', name: 'suliman'),
-    UserModel(id: '4', name: 'abbas'),
-  ];
-  final resetUsers = <UserModel>[
-    UserModel(id: '1', name: 'mohamed'),
-    UserModel(id: '2', name: 'syed'),
-    UserModel(id: '3', name: 'suliman'),
-    UserModel(id: '4', name: 'abbas'),
-  ];
-  //
-  UserModel _currentUser = UserModel(id: '', name: '');
-
-  UserModel get currentUser => _currentUser;
-  //
-  void setUser(UserModel userModel) {
-    _currentUser = userModel;
-    debugPrint('current user = ${_currentUser.name}');
-    removeUser(userModel);
-    notifyListeners();
-  }
-
-  void removeUser(UserModel userModel) {
-    users.remove(userModel);
-  }
-
-  void getUsers() {
-    users = resetUsers;
-    notifyListeners();
+  @override
+  void dispose() {
+    super.dispose();
+    // socket.disconnect();
   }
 }

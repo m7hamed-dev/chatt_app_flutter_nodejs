@@ -1,8 +1,12 @@
 import 'package:chat_app_nodejs/chat/chat_view.dart';
+import 'package:chat_app_nodejs/user/users_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'providers/users_provider.dart';
 
 void main() {
+  // Dart client
+
   runApp(
     MultiProvider(
       providers: [
