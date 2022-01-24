@@ -18,13 +18,13 @@ class _CahtViewState extends State<CahtView> {
   @override
   void initState() {
     super.initState();
-    ChatAPIs.initializeSocket(context);
+    ChatAPIs.initializeSocket();
   }
 
   //
   void setMessage(String msg, String type) {
     ChatAPIs.messages.add(MsgModel(msg: msg, type: type));
-    setState(() {});
+    // setState(() {});
   }
 
   ///
@@ -33,7 +33,7 @@ class _CahtViewState extends State<CahtView> {
     final _usersProvier = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: Text(_usersProvier.currentUser.name),
+        title: Text(_usersProvier.targetUser.name),
         leading: IconButton(
           onPressed: () {
             _usersProvier.getUsers();
@@ -56,15 +56,26 @@ class _CahtViewState extends State<CahtView> {
         onPressed: () {
           setMessage('msg', 'source');
           //
+          debugPrint('  login id = ${_usersProvier.loginUser.id}');
+          debugPrint('--------------------------------------------');
+          debugPrint('  target id = ${_usersProvier.targetUser.id}');
+          debugPrint('--------------------------------------------');
+          // return;
           ChatAPIs.sendMessage(
             _usersProvier.loginUser.id,
             'hi , msg',
-            widget.userID,
+            _usersProvier.targetUser.id,
           );
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    ChatAPIs.disposeSocket();
   }
 }

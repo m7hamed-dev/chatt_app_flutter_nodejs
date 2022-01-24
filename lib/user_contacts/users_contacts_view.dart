@@ -28,11 +28,10 @@ class UserContactsView extends StatelessWidget {
                   (index) {
                     return InkWell(
                       onTap: () {
-                        _usersProvier
-                            .selectTargetUser(_usersProvier.users[index]);
+                        _usersProvier.setTargetUser(_usersProvier.users[index]);
                         //
                         Push.to(context,
-                            CahtView(userID: _usersProvier.currentUser.id));
+                            CahtView(userID: _usersProvier.targetUser.id));
                       },
                       child: Container(
                         color: Colors.grey.shade200,

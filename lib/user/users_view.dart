@@ -1,5 +1,4 @@
 import 'package:chat_app_nodejs/chat/chat_view.dart';
-import 'package:chat_app_nodejs/models/user_model.dart';
 import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:chat_app_nodejs/tools/push.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +23,7 @@ class UserView extends StatelessWidget {
                 //
                 Push.to(
                   context,
-                  CahtView(userID: _usersProvier.currentUser.id),
+                  CahtView(userID: _usersProvier.loginUser.id),
                 );
               },
               child: Container(

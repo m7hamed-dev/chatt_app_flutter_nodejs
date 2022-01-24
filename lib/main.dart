@@ -1,13 +1,9 @@
-import 'package:chat_app_nodejs/chat/chat_view.dart';
-import 'package:chat_app_nodejs/user/users_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth/login_view.dart';
 import 'providers/users_provider.dart';
 
 void main() {
-  // Dart client
-
   runApp(
     MultiProvider(
       providers: [
@@ -24,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Chat - App',
+      title: 'Chat - App',
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),

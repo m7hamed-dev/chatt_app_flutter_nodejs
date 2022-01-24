@@ -1,8 +1,8 @@
-import 'package:chat_app_nodejs/chat/chat_view.dart';
 import 'package:chat_app_nodejs/chat_api/chat_api.dart';
 import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:chat_app_nodejs/tools/push.dart';
 import 'package:chat_app_nodejs/user_contacts/users_contacts_view.dart';
+import 'package:chat_app_nodejs/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 
@@ -17,10 +17,9 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    ChatAPIs.initializeSocket(context);
+    ChatAPIs.initializeSocket();
   }
 
-  // final String targetID;
   @override
   Widget build(BuildContext context) {
     final _usersProvier = context.watch<UserProvider>();
@@ -42,16 +41,18 @@ class _LoginViewState extends State<LoginView> {
                     return InkWell(
                       onTap: () {
                         ChatAPIs.signInUserInSocket(
-                            _usersProvier.users[index].id);
+                            _usersProvier.users[index].id, context);
                         //
                         _usersProvier.setLoginUser(_usersProvier.users[index]);
                         Push.to(context, const UserContactsView());
                       },
-                      child: Container(
-                        color: Colors.grey.shade200,
+                      child: CustomCard(
                         margin: const EdgeInsets.all(10.0),
                         child: ListTile(
-                          leading: const CircleAvatar(),
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                _usersProvier.users[index].imgPath),
+                          ),
                           title: Text(_usersProvier.users[index].id),
                           subtitle: Text(_usersProvier.users[index].name),
                         ),

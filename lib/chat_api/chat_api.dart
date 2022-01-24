@@ -7,27 +7,19 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 class ChatAPIs {
   // define socket io
   static io.Socket socket =
-      io.io("http://192.168.121.225:5000", <String, dynamic>{
+      io.io("http://192.168.230.225:5000", <String, dynamic>{
     "transports": ["websocket"],
     "autoConnect": false,
   });
   // final String ipAddress = '192.168.133.225';
   static List<MsgModel> messages = <MsgModel>[];
 
-  static void initializeSocket(BuildContext context) {
-    final _userProvider = context.read<UserProvider>();
+  static void initializeSocket() {
     try {
       socket.connect();
       // event on connect success
       socket.onConnect((_) {
         debugPrint('onConnect');
-        //
-        socket.on("message", (data) {
-          final _msgModel = MsgModel(msg: 'sss', type: 'destnation');
-          messages.add(_msgModel);
-          sendMessage(
-              _userProvider.loginUser.id, 'sss', _userProvider.currentUser.id);
-        });
       });
       //
       socket.onError((error) {
@@ -39,9 +31,17 @@ class ChatAPIs {
   }
 
   // login user
-  static void signInUserInSocket(String userID) {
+  static void signInUserInSocket(String userID, BuildContext context) {
+    final _userProvider = context.read<UserProvider>();
     // first login user by id
     socket.emit("signIn", userID);
+    //
+    socket.on("message", (data) {
+      // final _msgModel = MsgModel(msg: 'sss', type: 'destnation');
+      // messages.add(_msgModel);
+      sendMessage(
+          _userProvider.loginUser.id, 'sss', _userProvider.targetUser.id);
+    });
   }
 
   // send msg
@@ -53,5 +53,9 @@ class ChatAPIs {
       "targetId": targetID,
       "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
     });
+  }
+
+  static void disposeSocket() {
+    socket.dispose();
   }
 }
