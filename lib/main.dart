@@ -2,6 +2,7 @@ import 'package:chat_app_nodejs/chat/chat_view.dart';
 import 'package:chat_app_nodejs/user/users_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'auth/login_view.dart';
 import 'providers/users_provider.dart';
 
 void main() {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),
-      home: const UserView(),
+      home: const LoginView(),
     );
   }
 }

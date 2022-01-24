@@ -2,12 +2,13 @@ import 'package:chat_app_nodejs/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class UserProvider extends ChangeNotifier {
-  var users = <UserModel>[
+  List<UserModel> users = <UserModel>[
     UserModel(id: '1', name: 'mohamed'),
     UserModel(id: '2', name: 'syed'),
     UserModel(id: '3', name: 'suliman'),
     UserModel(id: '4', name: 'abbas'),
   ];
+  //
   final resetUsers = <UserModel>[
     UserModel(id: '1', name: 'mohamed'),
     UserModel(id: '2', name: 'syed'),
@@ -16,12 +17,21 @@ class UserProvider extends ChangeNotifier {
   ];
   //
   UserModel _currentUser = UserModel(id: '', name: '');
+  UserModel _loginUser = UserModel(id: '', name: '');
 
   UserModel get currentUser => _currentUser;
+  UserModel get loginUser => _currentUser;
   //
-  void setUser(UserModel userModel) {
+  void setLoginUser(UserModel userModel) {
+    _loginUser = userModel;
+    debugPrint('_loginUser user = ${_loginUser.name}');
+    removeUser(userModel);
+    notifyListeners();
+  } //
+
+  void selectTargetUser(UserModel userModel) {
     _currentUser = userModel;
-    debugPrint('current user = ${_currentUser.name}');
+    debugPrint('selectUser user = ${_currentUser.name}');
     removeUser(userModel);
     notifyListeners();
   }

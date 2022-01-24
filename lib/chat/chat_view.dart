@@ -1,7 +1,8 @@
+import 'package:chat_app_nodejs/chat/chat_bubble.dart';
+import 'package:chat_app_nodejs/chat_api/chat_api.dart';
 import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
-import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class CahtView extends StatefulWidget {
   const CahtView({Key? key, required this.userID}) : super(key: key);
@@ -14,41 +15,18 @@ class _CahtViewState extends State<CahtView> {
   @override
   void initState() {
     super.initState();
-    initializeSocket();
+    ChatAPIs.initializeSocket();
   }
 
-  io.Socket socket = io.io("http://192.168.127.225:5000", <String, dynamic>{
-    "transports": ["websocket"],
-    "autoConnect": false,
-  });
-  // final String ipAddress = '192.168.133.225';
-  void initializeSocket() {
-    // debugPrint('initializeSocket .........');
-    try {
-      socket.connect();
-      // event on connect success
-      socket.onConnect((_) {
-        debugPrint('onConnect');
-      });
-      // first login user by id
-      socket.emit("signIn", widget.userID);
-      socket.onError((error) {
-        debugPrint('error = $error');
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  void sendMessage(String message, String targetID) {
-    // second send msg
-    socket.emit("message", {
-      "id": widget.userID,
-      "message": message,
-      "username": targetID,
-      "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
-    });
-  }
+  // void sendMessage(String message, String targetID) {
+  //   // second send msg
+  //   socket.emit("message", {
+  //     "id": widget.userID,
+  //     "message": message,
+  //     "username": targetID,
+  //     "sentAt": DateTime.now().toLocal().toString().substring(0, 16),
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +34,32 @@ class _CahtViewState extends State<CahtView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_usersProvier.currentUser.name),
+        leading: IconButton(
+          onPressed: () {
+            _usersProvier.getUsers();
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back_ios),
+        ),
       ),
       body: ListView(
-        children: const [],
+        children: [
+          ..._allMsgs(),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          sendMessage('hi mohamed', _usersProvier.currentUser.id);
+          // sendMessage('hi mohamed', _usersProvier.currentUser.id);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  List<ChatBubble> _allMsgs() {
+    return List.generate(
+        90, (index) => ChatBubble(isSender: true, msg: 'msg $index')).toList();
   }
 
   @override

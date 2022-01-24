@@ -1,4 +1,5 @@
 import 'package:chat_app_nodejs/chat/chat_view.dart';
+import 'package:chat_app_nodejs/models/user_model.dart';
 import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:chat_app_nodejs/tools/push.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,14 @@ class UserView extends StatelessWidget {
   Widget build(BuildContext context) {
     final _usersProvier = context.watch<UserProvider>();
     return Scaffold(
+      appBar: AppBar(),
       body: ListView(
         children: List.generate(
           _usersProvier.users.length,
           (index) {
             return InkWell(
               onTap: () {
-                _usersProvier.setUser(_usersProvier.users[index]);
+                _usersProvier.setLoginUser(_usersProvier.users[index]);
                 //
                 Push.to(
                   context,
