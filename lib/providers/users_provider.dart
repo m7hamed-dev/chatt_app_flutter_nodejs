@@ -15,21 +15,61 @@ const userFour =
 
 class UserProvider extends ChangeNotifier {
   List<UserModel> users = <UserModel>[
-    UserModel(id: '1', name: 'mohamed', imgPath: userOne),
-    UserModel(id: '2', name: 'syed', imgPath: userTow),
-    UserModel(id: '3', name: 'suliman', imgPath: userThree),
-    UserModel(id: '4', name: 'abbas', imgPath: userFour),
+    UserModel(
+      id: '1',
+      name: 'mohamed',
+      imgPath: userOne,
+      phone: '+249929928299',
+    ),
+    UserModel(
+      id: '2',
+      name: 'syed',
+      imgPath: userTow,
+      phone: '+249929928299',
+    ),
+    UserModel(
+      id: '3',
+      name: 'suliman',
+      imgPath: userThree,
+      phone: '+249929928299',
+    ),
+    UserModel(
+      id: '4',
+      name: 'abbas',
+      imgPath: userFour,
+      phone: '+249929928299',
+    ),
   ];
   //
   final resetUsers = <UserModel>[
-    UserModel(id: '1', name: 'mohamed', imgPath: userOne),
-    UserModel(id: '2', name: 'syed', imgPath: userTow),
-    UserModel(id: '3', name: 'suliman', imgPath: userThree),
-    UserModel(id: '4', name: 'abbas', imgPath: userFour),
+    UserModel(
+      id: '1',
+      name: 'mohamed',
+      imgPath: userOne,
+      phone: '+249929928299',
+    ),
+    UserModel(
+      id: '2',
+      name: 'syed',
+      imgPath: userTow,
+      phone: '+249929928299',
+    ),
+    UserModel(
+      id: '3',
+      name: 'suliman',
+      imgPath: userThree,
+      phone: '+249929928299',
+    ),
+    UserModel(
+      id: '4',
+      name: 'abbas',
+      imgPath: userFour,
+      phone: '+249929928299',
+    ),
   ];
   //
-  UserModel _setTagetUser = UserModel(id: '', name: '', imgPath: '');
-  UserModel _loginUser = UserModel(id: '', name: '', imgPath: '');
+  late UserModel _setTagetUser;
+  late UserModel _loginUser;
 
   UserModel get targetUser => _setTagetUser;
   UserModel get loginUser => _loginUser;
@@ -43,6 +83,7 @@ class UserProvider extends ChangeNotifier {
 
   void setTargetUser(UserModel userModel) {
     _setTagetUser = userModel;
+    _setTagetUser.isOnline = true;
     debugPrint('chat user with ( ${_setTagetUser.name} )');
     notifyListeners();
   }
@@ -53,6 +94,19 @@ class UserProvider extends ChangeNotifier {
 
   void getUsers() {
     users = resetUsers;
+    notifyListeners();
+  }
+
+  final messageController = TextEditingController();
+  //
+  bool isSendIcon = false;
+  //
+  void validation(String value) {
+    if (value.isEmpty) {
+      isSendIcon = false;
+    } else {
+      isSendIcon = true;
+    }
     notifyListeners();
   }
 }

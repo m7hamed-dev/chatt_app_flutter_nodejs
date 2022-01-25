@@ -15,7 +15,7 @@ class ReplyMsgCard extends StatelessWidget {
       margin: const EdgeInsets.all(10.0),
       width: 100,
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(.4),
+        color: Colors.grey.shade200,
         borderRadius: const BorderRadius.only(
           bottomRight: Radius.circular(12),
         ),

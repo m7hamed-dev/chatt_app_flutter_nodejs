@@ -1,25 +1,32 @@
-import 'package:provider/src/provider.dart';
 import 'package:chat_app_nodejs/models/msg_model.dart';
-import 'package:chat_app_nodejs/providers/users_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
-class ChatAPIs {
+class ChatAPIs with ChangeNotifier {
+  ChatAPIs() {
+    initializeSocket();
+  }
   // define socket io
   static io.Socket socket =
-      io.io("http://192.168.230.225:5000", <String, dynamic>{
+      io.io("http://192.168.228.225:5000", <String, dynamic>{
     "transports": ["websocket"],
     "autoConnect": false,
   });
-  // final String ipAddress = '192.168.133.225';
-  static List<MsgModel> messages = <MsgModel>[];
+  List<MsgModel> messages = <MsgModel>[];
 
-  static void initializeSocket() {
+  void initializeSocket() {
     try {
       socket.connect();
       // event on connect success
       socket.onConnect((_) {
-        debugPrint('onConnect');
+        debugPrint('onConnect .......');
+        socket.on("message", (data) {
+          debugPrint('data = $data');
+          setMessage('dest', data['message']);
+        });
+      });
+      socket.onDisconnect((data) {
+        debugPrint('onDisconnect .......');
       });
       //
       socket.onError((error) {
@@ -30,23 +37,15 @@ class ChatAPIs {
     }
   }
 
-  // login user
-  static void signInUserInSocket(String userID, BuildContext context) {
-    final _userProvider = context.read<UserProvider>();
-    // first login user by id
-    socket.emit("signIn", userID);
-    //
-    socket.on("message", (data) {
-      // final _msgModel = MsgModel(msg: 'sss', type: 'destnation');
-      // messages.add(_msgModel);
-      sendMessage(
-          _userProvider.loginUser.id, 'sss', _userProvider.targetUser.id);
-    });
+  void setMessage(String type, String message) {
+    MsgModel messageModel = MsgModel(type: type, msg: message);
+    messages.add(messageModel);
+    notifyListeners();
   }
 
-  // send msg
-  static void sendMessage(String userID, String msg, String targetID) {
-    // first login user by id
+  void signInUserInSocket(String userID) => socket.emit("signIn", userID);
+
+  void sendMessage(String userID, String msg, String targetID) {
     socket.emit("message", {
       "id": userID,
       "message": msg,
@@ -55,7 +54,7 @@ class ChatAPIs {
     });
   }
 
-  static void disposeSocket() {
+  void disposeSocket() {
     socket.dispose();
   }
 }

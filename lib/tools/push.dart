@@ -9,4 +9,14 @@ class Push {
       ),
     );
   }
+
+  static void toAndClose(BuildContext context, Widget page) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => page,
+      ),
+      (v) => false,
+    );
+  }
 }
